@@ -3,19 +3,10 @@ function Mouth(x, y, direction) {
   this.x = x;
   this.y = y;
   this.direction = direction;
-  this.open = false;
+  this.isOpen = false;
   this.onchange = new EventHandlerList();
+  this.oninsert = new EventHandlerList();
 }
-
-Mouth.prototype.eat = function () {
-  'use strict';
-  this.open = true;
-  this.onchange.fire({open: true});
-  setTimeout(function () {
-    this.open = false;
-    this.onchange.fire({open: false});
-  }.bind(this), 500);
-};
 
 Mouth.prototype.draw = function (context) {
   'use strict';
@@ -24,7 +15,7 @@ Mouth.prototype.draw = function (context) {
   context.rotate(this.direction);
   context.beginPath();
   context.strokeStyle = 'limegreen';
-  if (this.open) {
+  if (this.isOpen) {
     context.moveTo(3, 2);
     context.lineTo(0, 0);
     context.lineTo(5, -1);
@@ -34,4 +25,24 @@ Mouth.prototype.draw = function (context) {
   }
   context.stroke();
   context.restore();
+};
+
+Mouth.prototype.tryInsert = function (amount) {
+  'use strict';
+  if (this.isOpen) {
+    this.oninsert.fire({amount: amount});
+    return true;
+  }
+  return false;
+};
+
+// actions
+Mouth.prototype.open = function () {
+  'use strict';
+  this.isOpen = true;
+  this.onchange.fire();
+  setTimeout(function () {
+    this.isOpen = false;
+    this.onchange.fire();
+  }.bind(this), 200);
 };

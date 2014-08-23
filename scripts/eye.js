@@ -1,4 +1,4 @@
-function Eye(x, y, direction) {
+function Eye(x, y, direction, brain) {
   'use strict';
   this.x = x;
   this.y = y;
@@ -6,7 +6,11 @@ function Eye(x, y, direction) {
   this.photoreceptors = [];
   var i;
   for (i = 0; i < 11; i += 1) {
-    this.photoreceptors.push(new Photoreceptor(-0.5 + 0.1 * i));
+    this.photoreceptors.push(new Photoreceptor(
+      -0.5 + 0.1 * i,
+      ['food', 'wall', 'fish'],
+      brain
+    ));
   }
   this.onchange = new EventHandlerList();
 }
@@ -22,6 +26,14 @@ Eye.prototype.draw = function (context) {
   context.restore();
 };
 
+Eye.prototype.stimulate = function (direction, color, magnitude) {
+  'use strict';
+  this.photoreceptors.forEach(function (p) {
+    p.stimulate(direction, color, magnitude);
+  });
+};
+
+// actions
 Eye.prototype.lookDown = function () {
   'use strict';
   this.direction = 0.7;
@@ -40,11 +52,4 @@ Eye.prototype.lookUp = function () {
     this.direction = 0;
     this.onchange.fire({direction: this.direction});
   }.bind(this), 900);
-};
-
-Eye.prototype.stimulate = function (direction, color, magnitude) {
-  'use strict';
-  this.photoreceptors.forEach(function (p) {
-    p.stimulate(direction, color, magnitude);
-  });
 };

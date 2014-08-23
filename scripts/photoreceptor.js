@@ -1,7 +1,9 @@
-function Photoreceptor(direction) {
+function Photoreceptor(direction, colors, brain) {
   'use strict';
   this.direction = direction;
-  this.onfire = new EventHandlerList();
+  this.colors = new Map(colors.map(function (c) {
+    return [c, brain.addNeuron()];
+  }));
 }
 
 Photoreceptor.prototype.draw = function (context) {
@@ -15,7 +17,7 @@ Photoreceptor.prototype.draw = function (context) {
 
 Photoreceptor.prototype.stimulate = function (direction, color, magnitude) {
   'use strict';
-  if (Math.abs(this.direction - direction) < 0.3) {
-    this.onfire.fire({color: color, magnitude: magnitude});
+  if (Math.abs(this.direction - direction) < 0.3 && this.colors.had(color)) {
+    this.colors.get(color).fire(magnitude);
   }
 };

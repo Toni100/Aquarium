@@ -1,13 +1,33 @@
 function Aquarium(canvas) {
   'use strict';
-  this.canvas = canvas;
   this.fish = [];
+  this.canvas = canvas;
+  this.onclickfish = new EventHandlerList();
+  canvas.onclick = function (event) {
+    var x = event.layerX,
+      y = event.layerY,
+      candidate;
+    this.fish.forEach(function (f) {
+      if (candidate) {
+        if (Math.pow(f.x - x, 2) + Math.pow(f.y - y, 2) < Math.pow(candidate.x - x, 2) + Math.pow(candidate.y - y, 2)) {
+          candidate = f;
+        }
+      } else {
+        candidate = f;
+      }
+    });
+    if (candidate) {
+      this.fish.forEach(function (f) { f.selected = false; });
+      candidate.selected = true;
+      this.onclickfish.fire({fish: candidate});
+    }
+  }.bind(this);
   setInterval(function () {
     this.fish.forEach(function (f) {
       var dir = ((f.direction % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
       if ((f.x < 10 && Math.PI / 2 < dir && dir < 3 * Math.PI / 2) ||
           (f.y < 10 && Math.PI < dir && dir < 2 * Math.PI) ||
-          (f.x > canvas.width - 10 && ((0 <= dir < Math.PI / 2) || (3 * Math.PI / 2 < dir <= 2 * Math.PI))) ||
+          (f.x > canvas.width - 10 && ((0 <= dir && dir < Math.PI / 2) || (3 * Math.PI / 2 < dir && dir <= 2 * Math.PI))) ||
           (f.y > canvas.height - 10 && 0 < dir && dir < Math.PI)) {
         f.stop();
       }
@@ -15,27 +35,6 @@ function Aquarium(canvas) {
       f.v *= 0.99;
     });
   }.bind(this), 40);
-  var i = 0;
-  setInterval(function () {
-    i += 1;
-    if (i >= this.fish.length) {
-      i = 0;
-    }
-    this.fish[i].mouth.eat();
-    if (Math.random() > 0.7) {
-      this.fish[i].eye.lookUp();
-    } else if (Math.random() > 0.7) {
-      this.fish[i].eye.lookDown();
-    }
-    if (Math.random() > 0.3) {
-      this.fish[i].accelerate();
-    }
-    if (Math.random() > 0.8) {
-      this.fish[i].directionUp();
-    } else if (Math.random() > 0.6) {
-      this.fish[i].directionDown();
-    }
-  }.bind(this), 50);
 }
 
 Aquarium.prototype.addFish = function () {
