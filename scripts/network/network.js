@@ -27,8 +27,7 @@ function Network() {
             this.onaddsynapse.fire({synapse: event.data.addsynapse});
         }
         if (event.data.deletesynapse) {
-            this.synapses.delete(event.data.deletesynapse.id);
-            this.ondeletesynapse.fire({id: event.data.deletesynapse.id});
+            this.ondeletesynapse.fire({synapse: event.data.deletesynapse});
         }
         if (event.data.fire) {
             this.neurons.get(event.data.fire.id).onfire.fire({strength: event.data.fire.strength});

@@ -79,7 +79,7 @@ function NetworkView(canvas) {
             this.drawDelayed();
         }.bind(this),
         handleOndeletesynapse = function (event) {
-            this.neurons.get(event.data.n1id).postSynapses.delete(event.data.n2id);
+            this.neurons.get(event.data.synapse.n1id).postSynapses.delete(event.data.synapse.n2id);
             this.drawDelayed();
         }.bind(this),
         handleOnchangeweights = function (event) {
