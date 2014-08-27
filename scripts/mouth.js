@@ -1,27 +1,24 @@
-function Mouth(x, y, direction) {
+function Mouth(parent, initialxr, initialyr, initialdirr, brain) {
   'use strict';
-  this.x = x;
-  this.y = y;
-  this.direction = direction;
-  this.isOpen = false;
-  this.onchange = new EventHandlerList();
+  Shape.call(this, parent, initialxr, initialyr, initialdirr);
   this.oninsert = new EventHandlerList();
+  brain.addAction(this.open.bind(this));
 }
 
 Mouth.prototype.draw = function (context) {
   'use strict';
   context.save();
   context.translate(this.x, this.y);
-  context.rotate(this.direction);
-  context.beginPath();
+  context.rotate(this.dir);
   context.strokeStyle = 'limegreen';
+  context.beginPath();
   if (this.isOpen) {
-    context.moveTo(3, 2);
+    context.moveTo(6, 4);
     context.lineTo(0, 0);
-    context.lineTo(5, -1);
+    context.lineTo(10, -2);
   } else {
     context.moveTo(0, 0);
-    context.lineTo(4, 0);
+    context.lineTo(8, 0);
   }
   context.stroke();
   context.restore();
@@ -40,9 +37,7 @@ Mouth.prototype.tryInsert = function (amount) {
 Mouth.prototype.open = function () {
   'use strict';
   this.isOpen = true;
-  this.onchange.fire();
   setTimeout(function () {
     this.isOpen = false;
-    this.onchange.fire();
   }.bind(this), 200);
 };

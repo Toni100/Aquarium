@@ -1,6 +1,6 @@
-function Photoreceptor(direction, colors, brain) {
+function Photoreceptor(parent, initialxr, initialyr, initialdirr, brain, colors) {
   'use strict';
-  this.direction = direction;
+  Shape.call(this, parent, initialxr, initialyr, initialdirr);
   this.colors = new Map(colors.map(function (c) {
     return [c, brain.addNeuron()];
   }));
@@ -8,16 +8,28 @@ function Photoreceptor(direction, colors, brain) {
 
 Photoreceptor.prototype.draw = function (context) {
   'use strict';
-  context.strokeStyle = 'rgba(200, 160, 170, 0.3)';
+  context.save();
+  context.translate(this.x, this.y);
+  context.rotate(this.dir);
+  context.strokeStyle = this.activated ? 'orange' : 'rgba(200, 160, 170, 0.3)';
   context.beginPath();
-  context.moveTo(3 * Math.cos(this.direction), 3 * Math.sin(this.direction));
-  context.lineTo(12 * Math.cos(this.direction), 12 * Math.sin(this.direction));
+  context.moveTo(3, 0);
+  context.lineTo(22, 0);
   context.stroke();
+  context.restore();
 };
 
-Photoreceptor.prototype.stimulate = function (direction, color, magnitude) {
+Photoreceptor.prototype.tryStimulate = function (visual) {
   'use strict';
-  if (Math.abs(this.direction - direction) < 0.3 && this.colors.had(color)) {
-    this.colors.get(color).fire(magnitude);
+  visual.forEach(function (v) {
+    if (this.colors.has(v.type)) {
+      this.colors.get(v.type).stimulate(Math.min(1, 50 / v.distance));
+      this.activated = true;
+    }
+  }, this);
+  if (this.activated) {
+    setTimeout(function () {
+      this.activated = false;
+    }.bind(this), 50);
   }
 };

@@ -1,6 +1,7 @@
 function Aquarium(canvas) {
   'use strict';
   this.fish = [];
+  this.food = [];
   this.canvas = canvas;
   this.onclickfish = new EventHandlerList();
   canvas.onclick = function (event) {
@@ -24,7 +25,7 @@ function Aquarium(canvas) {
   }.bind(this);
   setInterval(function () {
     this.fish.forEach(function (f) {
-      var dir = ((f.direction % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+      var dir = ((f.dir % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
       if ((f.x < 10 && Math.PI / 2 < dir && dir < 3 * Math.PI / 2) ||
           (f.y < 10 && Math.PI < dir && dir < 2 * Math.PI) ||
           (f.x > canvas.width - 10 && ((0 <= dir && dir < Math.PI / 2) || (3 * Math.PI / 2 < dir && dir <= 2 * Math.PI))) ||
@@ -35,6 +36,13 @@ function Aquarium(canvas) {
       f.v *= 0.99;
     });
   }.bind(this), 40);
+  setInterval(function () {
+    this.fish.forEach(function (f) {
+      f.eye.photoreceptors.forEach(function (p) {
+        p.tryStimulate(this.getVisual(p.x, p.y, p.dir));
+      }, this);
+    }, this);
+  }.bind(this), 1000);
 }
 
 Aquarium.prototype.addFish = function () {
@@ -44,8 +52,17 @@ Aquarium.prototype.addFish = function () {
     10 + Math.random() * (this.canvas.height - 20),
     2 * Math.PI * Math.random()
   );
-  fish.onchange.add(this.draw.bind(this));
   this.fish.push(fish);
+  this.draw();
+};
+
+Aquarium.prototype.addFood = function () {
+  'use strict';
+  this.food.push(new Food(
+    10 + Math.random() * (this.canvas.width - 20),
+    10 + Math.random() * (this.canvas.height - 20),
+    0.3 * Math.random()
+  ));
   this.draw();
 };
 
@@ -58,5 +75,21 @@ Aquarium.prototype.draw = function () {
     var context = this.canvas.getContext('2d');
     context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.fish.forEach(function (f) { f.draw(context); });
+    this.food.forEach(function (f) { f.draw(context); });
+    this.draw();
   }.bind(this));
+};
+
+Aquarium.prototype.getVisual = function (x, y, dir) {
+  'use strict';
+  var visual = [];
+  this.food.forEach(function (f) {
+    if (Math.abs((Math.abs(dir - Math.atan2(f.y - y, f.x - x)) + Math.PI) % (2 * Math.PI) - Math.PI) < 0.05) {
+      visual.push({
+        type: 'food',
+        distance: Math.sqrt(Math.pow(f.x - x, 2) + Math.pow(f.y - y, 2))
+      });
+    }
+  });
+  return visual;
 };
