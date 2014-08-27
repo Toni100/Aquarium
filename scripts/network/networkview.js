@@ -151,13 +151,17 @@ NetworkView.prototype.draw = function () {
         this.reducedNeurons.forEach(function (n) {
             if (n.stimulated) {
                 context.beginPath();
-                context.strokeStyle = 'rgb(0, 150, 180)';
-                context.arc(n.xt, n.yt, 5, 0, 2 * Math.PI, false);
-                context.stroke();
-                context.beginPath();
-                context.fillStyle = 'rgba(100, 250, 180, 0.7)';
-                context.arc(n.xt, n.yt, 4, 0, n.lastStimulationStrength * 2 * Math.PI, false);
+                if (n.lastStimulationStrength > 0) {
+                    context.fillStyle = 'rgba(100, 250, 180, 0.7)';
+                } else {
+                    context.fillStyle = 'rgba(250, 100, 180, 0.7)';
+                }
+                context.arc(n.xt, n.yt, 3, 0, n.lastStimulationStrength * 2 * Math.PI, false);
                 context.fill();
+                context.beginPath();
+                context.strokeStyle = 'rgb(0, 150, 180)';
+                context.arc(n.xt, n.yt, 4, 0, 2 * Math.PI, false);
+                context.stroke();
             }
         });
     }.bind(this));
