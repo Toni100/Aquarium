@@ -1,7 +1,7 @@
-function Mouth(parent, initialxr, initialyr, initialdirr, brain) {
+function Mouth(parent, initialxr, initialyr, initialdirr, brain, stomach) {
   'use strict';
   Shape.call(this, parent, initialxr, initialyr, initialdirr);
-  this.oninsert = new EventHandlerList();
+  this.stomach = stomach;
   brain.addAction(this.open.bind(this));
 }
 
@@ -24,13 +24,9 @@ Mouth.prototype.draw = function (context) {
   context.restore();
 };
 
-Mouth.prototype.tryInsert = function (amount) {
+Mouth.prototype.tryPut = function (food) {
   'use strict';
-  if (this.isOpen) {
-    this.oninsert.fire({amount: amount});
-    return true;
-  }
-  return false;
+  return this.isOpen && this.stomach.tryPut(food);
 };
 
 // actions
@@ -39,5 +35,5 @@ Mouth.prototype.open = function () {
   this.isOpen = true;
   setTimeout(function () {
     this.isOpen = false;
-  }.bind(this), 200);
+  }.bind(this), 400);
 };

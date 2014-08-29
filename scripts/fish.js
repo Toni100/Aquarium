@@ -4,11 +4,8 @@ function Fish(initialxr, initialyr, initialdirr) {
   this.v = 0;
   this.brain = new Network();
   this.eye = new Eye(this, 6, -4, 0, this.brain);
-  this.stomach = new Stomach(this.brain);
-  this.mouth = new Mouth(this, 4, 2, 0.5, this.brain);
-  this.mouth.oninsert.add(function (event) {
-    this.stomach.add(event.data.amount);
-  }.bind(this));
+  this.stomach = new Stomach(this, 0, 0, 0, this.brain);
+  this.mouth = new Mouth(this, 4, 2, 0.5, this.brain, this.stomach);
   for (var i = 0; i < 100; i += 1) {
     this.brain.addNeuron();
   }
@@ -45,6 +42,7 @@ Fish.prototype.draw = function (context) {
   context.lineTo(0, 12);
   context.fill();
   context.restore();
+  this.stomach.draw(context);
   this.eye.draw(context);
   this.mouth.draw(context);
 };

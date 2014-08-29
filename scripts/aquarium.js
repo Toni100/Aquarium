@@ -2,9 +2,9 @@ function Aquarium(canvas) {
   'use strict';
   this.fish = [];
   this.food = [];
-  this.canvas = canvas;
   this.onclickfish = new EventHandlerList();
-  canvas.onclick = function (event) {
+  this.canvas = canvas;
+  this.canvas.onclick = function (event) {
     var x = event.layerX,
       y = event.layerY,
       candidate;
@@ -23,26 +23,9 @@ function Aquarium(canvas) {
       this.onclickfish.fire({fish: candidate});
     }
   }.bind(this);
-  setInterval(function () {
-    this.fish.forEach(function (f) {
-      var dir = ((f.dir % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-      if ((f.x < 10 && Math.PI / 2 < dir && dir < 3 * Math.PI / 2) ||
-          (f.y < 10 && Math.PI < dir && dir < 2 * Math.PI) ||
-          (f.x > canvas.width - 10 && ((0 <= dir && dir < Math.PI / 2) || (3 * Math.PI / 2 < dir && dir <= 2 * Math.PI))) ||
-          (f.y > canvas.height - 10 && 0 < dir && dir < Math.PI)) {
-        f.stop();
-      }
-      f.move(0.04);
-      f.v *= 0.99;
-    });
-  }.bind(this), 40);
-  setInterval(function () {
-    this.fish.forEach(function (f) {
-      f.eye.photoreceptors.forEach(function (p) {
-        p.tryStimulate(this.getVisual(p.x, p.y, p.dir));
-      }, this);
-    }, this);
-  }.bind(this), 1000);
+  setInterval(this.deliverMotion.bind(this), 40);
+  setInterval(this.deliverVisual.bind(this), 800);
+  setInterval(this.deliverFood.bind(this), 150);
 }
 
 Aquarium.prototype.addFish = function () {
@@ -61,9 +44,45 @@ Aquarium.prototype.addFood = function () {
   this.food.push(new Food(
     10 + Math.random() * (this.canvas.width - 20),
     10 + Math.random() * (this.canvas.height - 20),
-    0.3 * Math.random()
+    0.24 * Math.random()
   ));
   this.draw();
+};
+
+Aquarium.prototype.deliverFood = function () {
+  'use strict';
+  this.fish.forEach(function (f) {
+    var food = this.getFood(f.mouth.x, f.mouth.y);
+    if (food.length) {
+      if (f.mouth.tryPut(food[0])) {
+        this.food.splice(this.food.indexOf(food[0]), 1);
+      }
+    }
+  }, this);
+};
+
+Aquarium.prototype.deliverMotion = function () {
+  'use strict';
+  this.fish.forEach(function (f) {
+    var dir = ((f.dir % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+    if ((f.x < 10 && Math.PI / 2 < dir && dir < 3 * Math.PI / 2) ||
+        (f.y < 10 && Math.PI < dir && dir < 2 * Math.PI) ||
+        (f.x > this.canvas.width - 10 && ((0 <= dir && dir < Math.PI / 2) || (3 * Math.PI / 2 < dir && dir <= 2 * Math.PI))) ||
+        (f.y > this.canvas.height - 10 && 0 < dir && dir < Math.PI)) {
+      f.stop();
+    }
+    f.move(0.04);
+    f.v *= 0.99;
+  }, this);
+};
+
+Aquarium.prototype.deliverVisual = function () {
+  'use strict';
+  this.fish.forEach(function (f) {
+    f.eye.photoreceptors.forEach(function (p) {
+      p.tryStimulate(this.getVisual(p.x, p.y, p.dir));
+    }, this);
+  }, this);
 };
 
 Aquarium.prototype.draw = function () {
@@ -78,6 +97,17 @@ Aquarium.prototype.draw = function () {
     this.food.forEach(function (f) { f.draw(context); });
     this.draw();
   }.bind(this));
+};
+
+Aquarium.prototype.getFood = function (x, y) {
+  'use strict';
+  var food = [];
+  this.food.forEach(function (f) {
+    if (Math.sqrt(Math.pow(f.x - x, 2) + Math.pow(f.y - y, 2)) < 15) {
+      food.push(f);
+    }
+  });
+  return food;
 };
 
 Aquarium.prototype.getVisual = function (x, y, dir) {
