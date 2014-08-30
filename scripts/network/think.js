@@ -132,11 +132,11 @@ Neuron.prototype.stimulate = function (strength) {
     var s = this.potential / 2;
     this.potential = 0;
     this.postSynapses.forEach(function (ps) { ps.stimulate(s); });
-    self.postMessage({fire: {id: this.id, strength: s}});
+    self.postMessage({fireneuron: {id: this.id, strength: s}});
     setTimeout(function () {
         this.charging = false;
         this.stimulate(0);
-    }.bind(this), 400);
+    }.bind(this), 10);
 };
 
 self.onmessage = function (event) {

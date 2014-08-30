@@ -87,6 +87,13 @@ function NetworkView(canvas) {
                 this.neurons.get(s.n1id).postSynapses.get(s.n2id).weight = s.weight;
             }, this);
             this.drawDelayed();
+        }.bind(this),
+        handleOnfireneuron = function (event) {
+            var n = this.neurons.get(event.data.id);
+            n.hasFired = true;
+            n.lastFireStrength = event.data.strength;
+            this.draw();
+            this.drawDelayed(200);
         }.bind(this);
     Object.defineProperty(this, 'network', {
         get: function () {
@@ -100,6 +107,7 @@ function NetworkView(canvas) {
                 network1.onaddsynapse.delete(handleOnaddsynapse);
                 network1.ondeletesynapse.delete(handleOndeletesynapse);
                 network1.onchangeweights.delete(handleOnchangeweights);
+                network1.onfireneuron.delete(handleOnfireneuron);
             }
             if (network) {
                 network1 = network;
@@ -107,6 +115,7 @@ function NetworkView(canvas) {
                 network.onaddsynapse.add(handleOnaddsynapse);
                 network.ondeletesynapse.add(handleOndeletesynapse);
                 network.onchangeweights.add(handleOnchangeweights);
+                network.onfireneuron.add(handleOnfireneuron);
                 network.neurons.forEach(function (n) {
                     this.neurons.set(n.id, new NeuronView(n, this));
                 }, this);
@@ -131,8 +140,6 @@ NetworkView.prototype.draw = function () {
         this.drawing = false;
         var context = this.canvas.getContext('2d');
         context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // synapses
         this.reducedNeurons.forEach(function (n) {
             n.postSynapses.forEach(function (s) {
                 context.beginPath();
@@ -142,8 +149,6 @@ NetworkView.prototype.draw = function () {
                 context.stroke();
             });
         });
-
-        // neurons
         this.reducedNeurons.forEach(function (n) {
             context.fillStyle = n.color;
             context.fillRect(n.xt - 2, n.yt - 2, 4, 4);
@@ -164,6 +169,20 @@ NetworkView.prototype.draw = function () {
                 context.stroke();
             }
         });
+        context.fillStyle = 'rgba(50, 200, 255, 0.5)';
+        context.strokeStyle = 'rgba(50, 200, 255, 0.5)';
+        context.beginPath();
+        this.reducedNeurons.forEach(function (n) {
+            if (n.hasFired) {
+                context.fillRect(n.xt - 2, n.yt - 2, 4, 4);
+                n.postSynapses.forEach(function (s) {
+                    context.moveTo(n.xt, n.yt);
+                    context.lineTo(s.postNeuron.xt, s.postNeuron.yt);
+                });
+                n.hasFired = false;
+            }
+        });
+        context.stroke();
     }.bind(this));
 };
 

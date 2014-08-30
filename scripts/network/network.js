@@ -29,8 +29,9 @@ function Network() {
         if (event.data.deletesynapse) {
             this.ondeletesynapse.fire({synapse: event.data.deletesynapse});
         }
-        if (event.data.fire) {
-            this.neurons.get(event.data.fire.id).onfire.fire({strength: event.data.fire.strength});
+        if (event.data.fireneuron) {
+            this.onfireneuron.fire(event.data.fireneuron);
+            this.neurons.get(event.data.fireneuron.id).onfire.fire({strength: event.data.fireneuron.strength});
         }
         if (event.data.weights) {
             this.onchangeweights.fire({weights: event.data.weights});
@@ -44,6 +45,7 @@ function Network() {
     this.onaddsynapse = new EventHandlerList();
     this.ondeletesynapse = new EventHandlerList();
     this.onchangeweights = new EventHandlerList();
+    this.onfireneuron = new EventHandlerList();
 }
 
 Network.prototype.addAction = function (f) {
