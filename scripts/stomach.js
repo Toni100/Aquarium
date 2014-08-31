@@ -1,13 +1,19 @@
 function Stomach(parent, initialxr, initialyr, initialdirr, brain) {
   'use strict';
   Shape.call(this, parent, initialxr, initialyr, initialdirr);
+  this.brain = brain;
   this.content = 0.2 + 0.2 * Math.random();
   var n = brain.addNeuron();
   setInterval(function () {
     n.stimulate(1 - this.content);
   }.bind(this), 2000);
   setInterval(function () {
-    this.content *= 0.95;
+    this.content *= 0.98;
+  }.bind(this), 5000);
+  setInterval(function () {
+    if (this.content < 0.2) {
+      this.brain.reward(-0.2);
+    }
   }.bind(this), 10000);
 }
 
@@ -33,6 +39,7 @@ Stomach.prototype.tryPut = function (food) {
   'use strict';
   if (this.content + food.amount <= 1) {
     this.content += food.amount;
+    this.brain.reward(0.2);
     return true;
   }
   return false;

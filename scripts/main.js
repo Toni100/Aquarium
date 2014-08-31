@@ -3,12 +3,12 @@ var aquarium = new Aquarium(document.getElementById('water')),
 while (aquarium.fish.length < 5) {
   aquarium.addFish();
 }
-while (aquarium.food.length < 10) {
+while (aquarium.food.length < 20) {
   aquarium.addFood();
 }
 setInterval(function () {
   'use strict';
-  while (aquarium.food.length < 25) {
+  while (aquarium.food.length < 50) {
     aquarium.addFood();
   }
 }, 9000);

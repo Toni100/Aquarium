@@ -73,7 +73,7 @@ function Synapse(postNeuron) {
 Synapse.prototype.reward = function (value) {
     'use strict';
     if (!this.activity) { return; }
-    this.weight *= Math.exp(0.3 * value * this.activity);
+    this.weight *= Math.exp(0.2 * value * Math.min(this.activity, 5));
     this.weight = Math.min(1, this.weight);
     postWeights();
     if (this.weight < 0.15) {
@@ -136,7 +136,7 @@ Neuron.prototype.stimulate = function (strength) {
     setTimeout(function () {
         this.charging = false;
         this.stimulate(0);
-    }.bind(this), 10);
+    }.bind(this), 100);
 };
 
 self.onmessage = function (event) {

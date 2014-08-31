@@ -113,8 +113,11 @@ Aquarium.prototype.getFood = function (x, y) {
 Aquarium.prototype.getVisual = function (x, y, dir) {
   'use strict';
   var visual = [];
+  function dirDiff(angle1, angle2) {
+    return Math.abs((Math.abs(angle1 - angle2) + Math.PI) % (2 * Math.PI) - Math.PI);
+  }
   this.food.forEach(function (f) {
-    if (Math.abs((Math.abs(dir - Math.atan2(f.y - y, f.x - x)) + Math.PI) % (2 * Math.PI) - Math.PI) < 0.05) {
+    if (dirDiff(dir, Math.atan2(f.y - y, f.x - x)) < 0.05) {
       visual.push({
         type: 'food',
         distance: Math.sqrt(Math.pow(f.x - x, 2) + Math.pow(f.y - y, 2))

@@ -9,15 +9,15 @@ function Fish(initialxr, initialyr, initialdirr) {
   for (var i = 0; i < 100; i += 1) {
     this.brain.addNeuron();
   }
-  this.brain.addAction(this.accelerate.bind(this));
-  this.brain.addAction(this.down.bind(this));
-  this.brain.addAction(this.up.bind(this));
-  this.reward = 0;
-  setInterval(function () {
-    this.reward = Math.min(1, Math.max(-1, this.reward));
-    this.brain.reward(this.reward);
-    this.reward = 0;
-  }.bind(this), 2000);
+  this.brain.addAction(function (event) {
+    this.accelerate(event.data.strength);
+  }.bind(this));
+  this.brain.addAction(function (event) {
+    this.down(event.data.strength);
+  }.bind(this));
+  this.brain.addAction(function (event) {
+    this.up(event.data.strength);
+  }.bind(this));
 }
 
 Fish.prototype.draw = function (context) {
@@ -57,21 +57,21 @@ Fish.prototype.stop = function () {
   'use strict';
   if (this.v === 0) { return; }
   this.v = 0;
-  this.reward -= 0.1;
+  this.brain.reward(-0.2);
 };
 
 // actions
-Fish.prototype.accelerate = function () {
+Fish.prototype.accelerate = function (strength) {
   'use strict';
-  this.v += 0.3 * (30 - this.v);
+  this.v += strength * 0.3 * (30 - this.v);
 };
 
-Fish.prototype.down = function () {
+Fish.prototype.down = function (strength) {
   'use strict';
-  this.dirr += 0.2;
+  this.dirr += strength * 0.3;
 };
 
-Fish.prototype.up = function () {
+Fish.prototype.up = function (strength) {
   'use strict';
-  this.dirr -= 0.2;
+  this.dirr -= strength * 0.3;
 };
