@@ -15,7 +15,7 @@ function Shape(parent, initialxr, initialyr, initialdirr) {
   });
   Object.defineProperty(this, 'dir', {
     get: function () {
-      return parent.dir + this.dirr;
+      return ((parent.dir + this.dirr) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
     }
   });
 }
