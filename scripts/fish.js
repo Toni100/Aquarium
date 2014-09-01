@@ -6,9 +6,6 @@ function Fish(initialxr, initialyr, initialdirr) {
   this.eye = new Eye(this, 6, -4, 0, this.brain);
   this.stomach = new Stomach(this, 0, 0, 0, this.brain);
   this.mouth = new Mouth(this, 4, 2, 0.5, this.brain, this.stomach);
-  for (var i = 0; i < 100; i += 1) {
-    this.brain.addNeuron();
-  }
   this.brain.addAction(function (event) {
     this.accelerate(event.data.strength);
   }.bind(this));
@@ -18,6 +15,9 @@ function Fish(initialxr, initialyr, initialdirr) {
   this.brain.addAction(function (event) {
     this.up(event.data.strength);
   }.bind(this));
+  while (this.brain.neurons.size < 1000) {
+    this.brain.addNeuron();
+  }
 }
 
 Fish.prototype.draw = function (context) {
