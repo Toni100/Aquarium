@@ -16,7 +16,7 @@ function connectNeurons() {
         neurons.forEach(function (n) {
             while (n.postSynapses.size < 4) { n.connect(); }
         });
-    }, 500);
+    }, 1000);
 }
 
 function getSynapses(id) {
@@ -100,13 +100,17 @@ function Neuron(id, x, y) {
 Neuron.prototype.connect = function () {
     'use strict';
     if (!neurons.size) { return; }
-    var candidates = new Set(neurons.values()),
+    var candidates = [],
         n,
         s;
-    candidates.delete(this);
-    this.postSynapses.forEach(function (s) { candidates.delete(s.postNeuron); });
+    neurons.forEach(function (n) {
+        if (n !== this) { candidates.push(n); }
+    }, this);
+    this.postSynapses.forEach(function (s) {
+        candidates.splice(candidates.indexOf(s.postNeuron), 1);
+    });
     n = randomChoice(candidates);
-    randomSample(candidates, 15).forEach(function (c) {
+    randomSample(candidates, neurons.size / 20).forEach(function (c) {
         if (c.distance(this) < n.distance(this)) { n = c; }
     }, this);
     s = new Synapse(n);
