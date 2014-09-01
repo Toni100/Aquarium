@@ -11,8 +11,10 @@ function Stomach(parent, initialxr, initialyr, initialdirr, brain) {
     this.content *= 0.98;
   }.bind(this), 5000);
   setInterval(function () {
-    if (this.content < 0.2) {
-      this.brain.reward(-0.2);
+    if (this.content < 0.1) {
+      this.brain.reward(-0.3);
+    } else if (this.content < 0.25) {
+      this.brain.reward(-0.1);
     }
   }.bind(this), 10000);
 }
@@ -42,5 +44,6 @@ Stomach.prototype.tryPut = function (food) {
     this.brain.reward(0.2);
     return true;
   }
+  this.brain.reward(-0.1);
   return false;
 };
